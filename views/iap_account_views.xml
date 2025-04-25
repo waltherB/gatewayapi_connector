@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="iap_account_view_form_gatewayapi" model="ir.ui.view">
+        <field name="name">iap.account.form.gatewayapi</field>
+        <field name="model">iap.account</field>
+        <field name="inherit_id" ref="iap.iap_account_view_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='service_name']" position="after">
+                <field name="provider_type" invisible="1"/>
+                <field name="gatewayapi_platform" attrs="{'invisible': [('provider_type', '!=', 'gatewayapi')], 'required': [('provider_type', '=', 'gatewayapi')]}"/>
+                <field name="gatewayapi_token" attrs="{'invisible': [('provider_type', '!=', 'gatewayapi')], 'required': [('provider_type', '=', 'gatewayapi')]}" password="True"/>
+            </xpath>
+        </field>
+    </record>
+</odoo>
