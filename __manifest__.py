@@ -3,8 +3,8 @@
     'version': '17.0.1.0.0',
     'category': 'SMS',
     'summary': 'Send SMS through GatewayAPI',
-    'author': 'Custom',
-    'website': 'https://gatewayapi.com',
+    'author': 'Walther Barnett',
+    'website': 'https://github.com/waltherB/gatewayapi_connector',
     'license': 'AGPL-3',
     'depends': ['sms', 'iap'],  # Keep the IAP dependency
     'data': [
