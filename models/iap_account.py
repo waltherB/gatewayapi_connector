@@ -1,12 +1,12 @@
 from odoo import fields, models, api
 
+
 class IapAccount(models.Model):
     _inherit = 'iap.account'
 
-    provider_type = fields.Selection(
-        selection_add=[('gatewayapi', 'GatewayAPI')],
-        ondelete={'gatewayapi': 'set default'}
-    )
+    provider_type = fields.Selection([
+        ('gatewayapi', 'GatewayAPI')
+    ], string='Provider Type')
     gatewayapi_platform = fields.Selection([
         ('eu', 'EU Platform (gatewayapi.eu)'),
         ('global', 'Global Platform (gatewayapi.com)')
