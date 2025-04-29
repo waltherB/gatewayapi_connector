@@ -1,3 +1,5 @@
+# This provider follows the OCA/server-tools iap_alternative_provider pattern:
+# https://github.com/OCA/server-tools/tree/17.0/iap_alternative_provider
 from odoo import fields, models, _
 from odoo.exceptions import UserError
 import logging

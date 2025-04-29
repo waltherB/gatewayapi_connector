@@ -5,7 +5,7 @@ class IapAccount(models.Model):
     _inherit = 'iap.account'
 
     provider_type = fields.Selection(
-        selection=[('gatewayapi', 'GatewayAPI')],
+        selection_add=[('gatewayapi', 'GatewayAPI')],
         string='Provider Type'
     )
     gatewayapi_platform = fields.Selection([
