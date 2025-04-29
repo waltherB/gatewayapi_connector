@@ -20,12 +20,12 @@ class GatewayAPIProvider(models.Model):
 
     def _get_gatewayapi_base_url(self, account):
         if account.gatewayapi_platform == 'eu':
-            return 'https://gatewayapi.eu'
-        return 'https://gatewayapi.com'
+            return 'https://messaging.gatewayapi.eu'
+        return 'https://messaging.gatewayapi.com'
 
     def _get_gatewayapi_endpoint(self, account):
         base_url = self._get_gatewayapi_base_url(account)
-        return f"{base_url}/rest/mtsms"
+        return f"{base_url}/mobile/multi"
 
     def _sanitize_sender_name(self, sender):
         """
@@ -53,51 +53,81 @@ class GatewayAPIProvider(models.Model):
             raise UserError(_("No valid GatewayAPI account found. Please configure one."))
 
         messages = []
+        invalid_records = self.env['sms.sms']
+        valid_records = self.env['sms.sms']
+
         for record in records:
             sender = self._sanitize_sender_name(record.sender)
             recipient = record.sanitized_number
-            message = record.message
 
             if not recipient:
-                record.state = 'error'
-                record.error_code = 'invalid_recipient'
+                invalid_records |= record
                 continue
 
             messages.append({
-                "message": message,
-                "recipients": [{"msisdn": int(recipient)}],
-                "sender": sender
+                "sender": sender,
+                "message": record.message,
+                "recipient": int(recipient.replace('+', '')),
+                "priority": "normal",
+                "expiration": "P5D",  # Default 5 days expiration
+                "reference": record.id  # Use record ID as reference
             })
+            valid_records |= record
+
+        if invalid_records:
+            invalid_records.write({
+                'state': 'error',
+                'error_code': 'invalid_recipient'
+            })
+
+        if not valid_records:
+            return True
 
         headers = {
             'Content-Type': 'application/json',
-            'Authorization': f'Bearer {account.gatewayapi_token}'
+            'Authorization': f'Token {account.gatewayapi_token}'  # Updated auth format
         }
 
         endpoint = self._get_gatewayapi_endpoint(account)
         _logger.info(f"Sending SMS to GatewayAPI: {endpoint}")
 
         try:
-            for message in messages:
-                response = requests.post(endpoint, headers=headers, json=message)
-                response_data = response.json()
+            # Send messages in batch using /mobile/multi endpoint
+            response = requests.post(
+                endpoint,
+                headers=headers,
+                json={"messages": messages}
+            )
+            response_data = response.json()
 
-                if response.status_code != 200:
-                    error_message = response_data.get('message', 'Unknown error')
-                    _logger.error(f"GatewayAPI error: {error_message}")
-                    record.state = 'error'
-                    record.error_code = error_message
-                else:
-                    record.state = 'sent'
-                    record.error_code = False
-                    # Store message ID for reference
-                    record.gateway_id = response_data.get('ids', [''])[0]
-                    
-                    _logger.info(f"SMS sent successfully: {response_data}")
+            if response.status_code != 200:  # API spec defines 200 as success
+                error_message = response_data.get('detail', 'Unknown error')
+                _logger.error(f"GatewayAPI error: {error_message}")
+                valid_records.write({
+                    'state': 'error',
+                    'error_code': error_message
+                })
+            else:
+                # Handle batch response
+                for response_msg in response_data.get('responses', []):
+                    msg_id = response_msg.get('msg_id')
+                    reference = response_msg.get('reference')
+                    if reference:
+                        record = valid_records.filtered(lambda r: str(r.id) == str(reference))
+                        if record:
+                            record.write({
+                                'state': 'sent',
+                                'error_code': False,
+                                'gateway_id': msg_id
+                            })
+                            _logger.info(f"SMS sent successfully: {response_msg}")
+
         except Exception as e:
             _logger.error(f"Error sending SMS through GatewayAPI: {e}")
-            record.state = 'error'
-            record.error_code = str(e)
+            valid_records.write({
+                'state': 'error',
+                'error_code': str(e)
+            })
 
         return True
 
