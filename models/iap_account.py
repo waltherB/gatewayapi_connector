@@ -110,3 +110,19 @@ class IapAccount(models.Model):
         res = super()._get_service_from_provider_form()
         res['gatewayapi'] = 'sms_gatewayapi'
         return res
+
+# --- Odoo 17 SMS sending override ---
+from odoo.addons.sms.models.sms_sms import SmsSms
+
+old_send = SmsSms._send
+
+def gatewayapi_sms_send(self):
+    for sms in self:
+        if sms.account_id and getattr(sms.account_id, 'provider_type', None) == 'gatewayapi':
+            response = sms.account_id.send_sms_gatewayapi(sms.body, sms.partner_mobile)
+            sms.external_id = response.get('msg_id')
+            sms.state = 'sent'
+            continue
+        old_send(sms)
+
+SmsSms._send = gatewayapi_sms_send
