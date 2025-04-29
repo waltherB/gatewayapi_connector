@@ -51,13 +51,13 @@ This module is licensed under AGPL-3.
 
 ## Webhook JWT Authentication Example
 
-When configuring the webhook in GatewayAPI, you must include a JWT in the Authorization header:
+When configuring the webhook in GatewayAPI, you must include a JWT in the Authorization header. This JWT token should be created during the webhook configuration on the GatewayAPI side, using the same shared secret that you set in Odoo (system parameter `gatewayapi_webhook_jwt_secret`).
 
 ```
 Authorization: Bearer <your_jwt_token>
 ```
 
-Here is an example of how to generate a JWT in Python using the `pyjwt` library:
+Here is an example of how to generate a JWT in Python using the `pyjwt` library (for use in GatewayAPI webhook configuration):
 
 ```python
 import jwt
