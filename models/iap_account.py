@@ -101,17 +101,17 @@ class IapAccount(models.Model):
 
     @api.model
     def _get_service_from_provider(self, provider_type=None):
+        """
+        Return the service name for the given provider_type.
+        Compatible with both record and model usage, and with or without provider_type argument.
+        """
+        # If called on a record and provider_type is not given, use the record's field
         if provider_type is None:
             provider_type = getattr(self, 'provider_type', None)
         if provider_type == 'gatewayapi':
             return 'sms_gatewayapi'
+        # If called on a record and no provider_type, fallback to super
         return super()._get_service_from_provider(provider_type)
-
-    @api.model
-    def _get_service_from_provider_form(self):
-        res = super()._get_service_from_provider_form()
-        res['gatewayapi'] = 'sms_gatewayapi'
-        return res
 
 # --- Odoo 17 SMS sending override ---
 from odoo.addons.sms.models.sms_sms import SmsSms
