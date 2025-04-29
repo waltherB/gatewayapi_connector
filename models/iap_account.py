@@ -100,7 +100,9 @@ class IapAccount(models.Model):
         return response.json()
 
     @api.model
-    def _get_service_from_provider(self, provider_type):
+    def _get_service_from_provider(self, provider_type=None):
+        if provider_type is None:
+            provider_type = getattr(self, 'provider_type', None)
         if provider_type == 'gatewayapi':
             return 'sms_gatewayapi'
         return super()._get_service_from_provider(provider_type)
