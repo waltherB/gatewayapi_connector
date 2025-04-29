@@ -7,13 +7,14 @@ import requests
 _logger = logging.getLogger(__name__)
 
 class GatewayAPIProvider(models.Model):
-    _inherit = 'sms.provider'
+    _name = 'sms.provider'
     _description = 'GatewayAPI Provider'
 
-    provider_type = fields.Selection(
-        selection_add=[('gatewayapi', 'GatewayAPI')],
-        ondelete={'gatewayapi': 'set default'}
-    )
+    name = fields.Char('Name', required=True)
+    active = fields.Boolean(default=True)
+    provider_type = fields.Selection([
+        ('gatewayapi', 'GatewayAPI')
+    ], string='Provider', required=True, default='gatewayapi')
 
     def _get_gatewayapi_account(self):
         return self.env['iap.account'].get_account('sms_gatewayapi')
