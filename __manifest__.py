@@ -2,7 +2,7 @@
     'name': 'GatewayAPI Connector',
     'version': '17.0.1.0.0',
     'category': 'SMS',
-    'summary': 'Send SMS through GatewayAPI',
+    'summary': 'Send SMS through GatewayAPI as a replacement for Odoo SMS IAP',
     'author': 'Custom',
     'website': 'https://gatewayapi.com',
     'license': 'AGPL-3',
