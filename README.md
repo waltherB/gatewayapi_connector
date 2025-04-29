@@ -14,7 +14,7 @@ This module integrates GatewayAPI's SMS service with Odoo, allowing you to send 
 
 ## Requirements
 
-- Odoo 16.0 or later
+- Odoo 17.0 or later
 - A GatewayAPI account with valid API token
 - Python 3.7 or later
 - Required Python packages:
@@ -28,8 +28,8 @@ This module integrates GatewayAPI's SMS service with Odoo, allowing you to send 
    git clone https://github.com/yourusername/gatewayapi_connector.git
    ```
 
-2. Update your Odoo addons list:
-   - Go to Apps menu
+2. Update your Odoo addons list and install the module:
+   - Go to the Apps menu in Odoo
    - Click "Update Apps List"
    - Search for "GatewayAPI Connector"
    - Click Install
@@ -44,14 +44,13 @@ This module integrates GatewayAPI's SMS service with Odoo, allowing you to send 
 
 ### 2. Module Configuration
 
-1. Go to Settings → Technical → Parameters → System Parameters
-2. Navigate to SMS → SMS Providers
-3. Create a new provider or edit the existing GatewayAPI provider
-4. Click on "Configure Account" button
-5. Enter your GatewayAPI token
-6. Select your preferred platform:
-   - Global (messaging.gatewayapi.com)
-   - EU (messaging.gatewayapi.eu)
+1. Go to Settings → Technical → SMS → IAP Accounts
+2. Create or edit an IAP Account and select "GatewayAPI" as the provider type
+3. Enter your GatewayAPI token
+4. Select your preferred platform:
+   - Global (gatewayapi.com)
+   - EU (gatewayapi.eu)
+5. Save the account
 
 ### 3. Testing the Integration
 
