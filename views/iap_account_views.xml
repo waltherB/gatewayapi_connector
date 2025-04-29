@@ -8,16 +8,16 @@
             <xpath expr="//field[@name='service_name']" position="after">
                 <field name="provider_type"/>
                 <field name="gatewayapi_base_url"
-                       attrs="{'invisible': [('provider_type', '!=', 'gatewayapi')], 'required': [('provider_type', '=', 'gatewayapi')]}"/>
+                       options="{'invisible': [('provider_type', '!=', 'gatewayapi')]}"/>
                 <field name="gatewayapi_token"
-                       attrs="{'invisible': [('provider_type', '!=', 'gatewayapi')], 'required': [('provider_type', '=', 'gatewayapi')]}" password="True"/>
+                       options="{'invisible': [('provider_type', '!=', 'gatewayapi')]}" password="True"/>
                 <field name="gatewayapi_sender"
-                       attrs="{'invisible': [('provider_type', '!=', 'gatewayapi')], 'required': [('provider_type', '=', 'gatewayapi')]}"/>
+                       options="{'invisible': [('provider_type', '!=', 'gatewayapi')]}"/>
                 <button name="action_test_gatewayapi_connection"
                         string="Test Connection"
                         type="object"
                         class="btn-primary"
-                        attrs="{'invisible': [('provider_type', '!=', 'gatewayapi')]}"/>
+                        options="{'invisible': [('provider_type', '!=', 'gatewayapi')]}"/>
             </xpath>
         </field>
     </record>
