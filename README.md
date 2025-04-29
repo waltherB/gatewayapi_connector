@@ -1,129 +1,79 @@
-# GatewayAPI Connector for Odoo
+# GatewayAPI Connector for Odoo 17
 
-This module integrates GatewayAPI's SMS service with Odoo, allowing you to send SMS messages directly from your Odoo instance using GatewayAPI's reliable messaging platform.
+This module replaces Odoo's SMS IAP with GatewayAPI, using their REST API. It allows you to send SMS messages via GatewayAPI, select the EU or Global platform, configure the sender name, and test connectivity directly from the IAP Account form.
 
 ## Features
-
-- Send SMS messages through GatewayAPI's platform
-- Support for both EU and Global platforms (messaging.gatewayapi.eu and messaging.gatewayapi.com)
-- Batch SMS sending capability
-- Customizable sender names
-- Message status tracking
-- Integration with Odoo's SMS framework
-- IAP (In-App Purchase) account management
+- Full replacement for Odoo's SMS IAP
+- Supports GatewayAPI EU and Global platforms
+- Sender name configuration with validation (per GatewayAPI rules)
+- Test Connection button in the IAP Account form
+- Handles all GatewayAPI status types
+- Odoo 17-compliant UI and code
 
 ## Requirements
-
-- Odoo 17.0 or later
-- A GatewayAPI account with valid API token
-- Python 3.7 or later
-- Required Python packages:
-  - requests
+- Odoo 17.0
+- Python package: `requests`
+- A GatewayAPI account and API token
 
 ## Installation
-
 1. Clone this repository into your Odoo addons directory:
    ```bash
    cd /path/to/odoo/addons
    git clone https://github.com/yourusername/gatewayapi_connector.git
    ```
-
-2. Update your Odoo addons list and install the module:
-   - Go to the Apps menu in Odoo
-   - Click "Update Apps List"
-   - Search for "GatewayAPI Connector"
-   - Click Install
+2. Update your Odoo apps list and install the module via the Apps menu.
 
 ## Configuration
+1. Go to Settings → Technical → IAP → IAP Accounts
+2. Create or edit an IAP Account
+3. Set Provider Type to "GatewayAPI"
+4. Select the platform (EU or Global)
+5. Enter your API token
+6. Enter your Sender Name (see rules below)
+7. Click the "Test Connection" button to verify connectivity
 
-### 1. GatewayAPI Account Setup
-
-1. Sign up for a GatewayAPI account at [GatewayAPI](https://gatewayapi.com/)
-2. Generate an API token from your GatewayAPI dashboard
-3. Note down your API token for later use
-
-### 2. Module Configuration
-
-1. Go to Settings → Technical → SMS → IAP Accounts
-2. Create or edit an IAP Account and select "GatewayAPI" as the provider type
-3. Enter your GatewayAPI token
-4. Select your preferred platform:
-   - Global (gatewayapi.com)
-   - EU (gatewayapi.eu)
-5. Save the account
-
-### 3. Testing the Integration
-
-1. Go to Settings → Technical → SMS → Send SMS
-2. Create a new SMS message
-3. Enter the recipient's phone number
-4. Write your message
-5. Click Send to test the integration
+### Sender Name Rules
+- Alphanumeric: Up to 11 characters (A-Z, a-z, 0-9)
+- Numeric: Up to 15 digits
+- See: https://gatewayapi.com/docs/limitations/#sms-sender
 
 ## Usage
-
-### Sending Individual SMS
-
-1. Navigate to any record with SMS functionality
-2. Click on the SMS button
-3. Enter your message
-4. Click Send
-
-### Sending Batch SMS
-
-1. Go to Settings → Technical → SMS → Send SMS
-2. Create a new SMS message
-3. Add multiple recipients
-4. Write your message
-5. Click Send to dispatch to all recipients
-
-## Technical Details
-
-- Success Response Code: 200
-- Sender Name Limitations:
-  - Alphanumeric: Up to 11 characters
-  - Numeric: Up to 15 digits
-  - Full UTF-8: Up to 11 characters
-- Message Expiration: 5 days by default
-- Priority: Normal (default)
+- When sending SMS via Odoo, messages will be routed through GatewayAPI using your configuration.
+- All message statuses from GatewayAPI are handled and mapped to Odoo's SMS status system.
 
 ## Troubleshooting
-
-Common issues and solutions:
-
-1. **Invalid Token Error**
-   - Verify your API token in the IAP account settings
-   - Ensure the token has the necessary permissions
-
-2. **Invalid Sender Name**
-   - Check that your sender name follows the length limitations
-   - Use only allowed characters
-
-3. **Message Not Sent**
-   - Check your internet connection
-   - Verify recipient number format (should include country code)
-   - Check Odoo logs for detailed error messages
-
-## Support
-
-For support:
-1. Check the [GatewayAPI Documentation](https://gatewayapi.com/docs/)
-2. Submit issues on the GitHub repository
-3. Contact your Odoo support team
+- If the Test Connection fails, check your API token and platform selection.
+- Ensure your sender name meets GatewayAPI's requirements.
+- Check Odoo logs for detailed error messages.
 
 ## License
+This module is licensed under AGPL-3.
 
-This module is licensed under LGPL-3.
+## Webhook JWT Authentication Example
 
-## Contributors
+When configuring the webhook in GatewayAPI, you must include a JWT in the Authorization header:
 
-- Your organization/name
-- Community contributors
+```
+Authorization: Bearer <your_jwt_token>
+```
 
-## Changelog
+Here is an example of how to generate a JWT in Python using the `pyjwt` library:
 
-### 1.0.0
-- Initial release
-- Basic SMS sending functionality
-- EU/Global platform support
-- IAP integration
+```python
+import jwt
+import datetime
+
+# Use the same secret as set in Odoo system parameters (gatewayapi_webhook_jwt_secret)
+secret = 'your_shared_secret_here'
+
+payload = {
+    'iat': int(datetime.datetime.utcnow().timestamp()),
+    'iss': 'gatewayapi',
+    # You can add more claims as needed
+}
+
+jwt_token = jwt.encode(payload, secret, algorithm='HS256')
+print(jwt_token)
+```
+
+Include the resulting token in the Authorization header when calling the webhook endpoint.
