@@ -34,18 +34,18 @@
         <field name="name">gatewayapi.provider.tree</field>
         <field name="model">gatewayapi.provider</field>
         <field name="arch" type="xml">
-            <tree string="GatewayAPI Providers">
+            <list string="GatewayAPI Providers">
                 <field name="name"/>
                 <field name="gatewayapi_platform"/>
                 <field name="active"/>
-            </tree>
+            </list>
         </field>
     </record>
 
     <record id="action_gatewayapi_provider" model="ir.actions.act_window">
         <field name="name">GatewayAPI Providers</field>
         <field name="res_model">gatewayapi.provider</field>
-        <field name="view_mode">tree,form</field>
+        <field name="view_mode">list,form</field>
     </record>
 
     <menuitem id="menu_gatewayapi_provider"

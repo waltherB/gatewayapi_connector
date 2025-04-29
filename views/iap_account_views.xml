@@ -7,8 +7,13 @@
         <field name="arch" type="xml">
             <xpath expr="//field[@name='service_name']" position="after">
                 <field name="provider_type" invisible="1"/>
-                <field name="gatewayapi_platform" attrs="{'invisible': [('provider_type', '!=', 'gatewayapi')], 'required': [('provider_type', '=', 'gatewayapi')]}"/>
-                <field name="gatewayapi_token" attrs="{'invisible': [('provider_type', '!=', 'gatewayapi')], 'required': [('provider_type', '=', 'gatewayapi')]}" password="True"/>
+                <field name="gatewayapi_platform" 
+                       invisible="provider_type != 'gatewayapi'"
+                       required="provider_type == 'gatewayapi'"/>
+                <field name="gatewayapi_token" 
+                       invisible="provider_type != 'gatewayapi'"
+                       required="provider_type == 'gatewayapi'"
+                       password="True"/>
             </xpath>
         </field>
     </record>
