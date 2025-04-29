@@ -14,6 +14,9 @@
                        invisible="provider_type != 'gatewayapi'"
                        required="provider_type == 'gatewayapi'"
                        password="True"/>
+                <field name="gatewayapi_sender" 
+                       invisible="provider_type != 'gatewayapi'"
+                       required="provider_type == 'gatewayapi'"/>
             </xpath>
         </field>
     </record>
