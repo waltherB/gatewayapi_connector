@@ -6,7 +6,7 @@
         <field name="inherit_id" ref="iap.iap_account_view_form"/>
         <field name="arch" type="xml">
             <xpath expr="//field[@name='service_name']" position="after">
-                <field name="provider_type" invisible="1"/>
+                <field name="provider_type"/>
                 <field name="gatewayapi_platform" 
                        invisible="provider_type != 'gatewayapi'"
                        required="provider_type == 'gatewayapi'"/>
