@@ -1,17 +1,15 @@
-from odoo import api, fields, models, _
+from odoo import fields, models, _
 from odoo.exceptions import UserError
-import json
 import logging
 import requests
 
 _logger = logging.getLogger(__name__)
 
+
 class GatewayAPIProvider(models.Model):
     _inherit = 'sms.provider'
     _description = 'GatewayAPI Provider'
 
-    name = fields.Char('Name', required=True)
-    active = fields.Boolean(default=True)
     provider_type = fields.Selection(
         selection_add=[('gatewayapi', 'GatewayAPI')],
         ondelete={'gatewayapi': 'set default'}
@@ -52,7 +50,9 @@ class GatewayAPIProvider(models.Model):
 
         account = self._get_gatewayapi_account()
         if not account or not account.gatewayapi_token:
-            raise UserError(_("No valid GatewayAPI account found. Please configure one."))
+            raise UserError(_(
+                "No valid GatewayAPI account found. Please configure one."
+            ))
 
         messages = []
         invalid_records = self.env['sms.sms']
@@ -87,7 +87,9 @@ class GatewayAPIProvider(models.Model):
 
         headers = {
             'Content-Type': 'application/json',
-            'Authorization': f'Token {account.gatewayapi_token}'  # Updated auth format
+            'Authorization': (
+                f'Token {account.gatewayapi_token}'  # Updated auth format
+            )
         }
 
         endpoint = self._get_gatewayapi_endpoint(account)
@@ -115,14 +117,18 @@ class GatewayAPIProvider(models.Model):
                     msg_id = response_msg.get('msg_id')
                     reference = response_msg.get('reference')
                     if reference:
-                        record = valid_records.filtered(lambda r: str(r.id) == str(reference))
+                        record = valid_records.filtered(
+                            lambda r: str(r.id) == str(reference)
+                        )
                         if record:
                             record.write({
                                 'state': 'sent',
                                 'error_code': False,
                                 'gateway_id': msg_id
                             })
-                            _logger.info(f"SMS sent successfully: {response_msg}")
+                            _logger.info(
+                                f"SMS sent successfully: {response_msg}"
+                            )
 
         except Exception as e:
             _logger.error(f"Error sending SMS through GatewayAPI: {e}")
@@ -133,24 +139,6 @@ class GatewayAPIProvider(models.Model):
 
         return True
 
-    def _get_available_provider_types(self):
-        res = super()._get_available_provider_types()
-        res.append('gatewayapi')
-        return res
-        
-    def action_configure_gatewayapi_account(self):
-        """Open the IAP Account configuration for GatewayAPI."""
-        account = self._get_gatewayapi_account()
-        action = self.env.ref('iap.iap_account_action').read()[0]
-        action.update({
-            'context': {
-                'default_service_name': 'sms_gatewayapi',
-                'default_provider_type': 'gatewayapi',
-            }
-        })
-        if account:
-            action['res_id'] = account.id
-        return action
 
 class SmsSms(models.Model):
     _inherit = 'sms.sms'
@@ -163,7 +151,9 @@ class SmsSms(models.Model):
     def _send_sms_gatewayapi(self, account, body, numbers):
         """Send SMS through GatewayAPI."""
         if not account.gatewayapi_token:
-            raise UserError(_("No valid GatewayAPI token found. Please configure one."))
+            raise UserError(_(
+                "No valid GatewayAPI token found. Please configure one."
+            ))
 
         base_url = self._get_gatewayapi_base_url(account)
         endpoint = f"{base_url}/mobile/multi"
@@ -191,7 +181,11 @@ class SmsSms(models.Model):
         }
 
         try:
-            response = requests.post(endpoint, headers=headers, json={"messages": messages})
+            response = requests.post(
+                endpoint,
+                headers=headers,
+                json={"messages": messages}
+            )
             response_data = response.json()
 
             if response.status_code != 200:
