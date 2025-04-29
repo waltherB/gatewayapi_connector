@@ -10,8 +10,6 @@
     'data': [
         'security/ir.model.access.csv',
         'views/iap_account_views.xml',
-        'views/gatewayapi_provider_views.xml',
-        'data/gatewayapi_data.xml',
     ],
     'installable': True,
     'application': False,
