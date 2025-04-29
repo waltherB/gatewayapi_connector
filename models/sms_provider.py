@@ -14,7 +14,7 @@ class GatewayAPIProvider(models.Model):
     active = fields.Boolean(default=True)
     provider_type = fields.Selection([
         ('gatewayapi', 'GatewayAPI')
-    ], string='Provider', required=True, default='gatewayapi')
+    ], string='Provider Type', required=True, default='gatewayapi')
 
     def _get_gatewayapi_account(self):
         return self.env['iap.account'].get_account('sms_gatewayapi')
