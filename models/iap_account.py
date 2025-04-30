@@ -31,6 +31,7 @@ class IapAccount(models.Model):
         size=15,
         required=True
     )
+    balance = fields.Char(string='GatewayAPI Balance', readonly=True)
 
     @api.constrains('gatewayapi_sender')
     def _check_sender_name(self):
@@ -47,37 +48,24 @@ class IapAccount(models.Model):
                 continue
             url = (
                 GATEWAYAPI_BASE_URLS[rec.gatewayapi_base_url]
-                + '/mobile/single'
+                + '/rest/me'
             )
             headers = {'Authorization': f'Token {rec.gatewayapi_token}'}
-            payload = {
-                'sender': rec.gatewayapi_sender or 'Test',
-                'message': 'Test connection',
-                'recipient': 4512345678,  # Use a fake but valid-format number
-            }
             try:
-                response = requests.post(url, json=payload, headers=headers, timeout=10)
+                response = requests.get(url, headers=headers, timeout=10)
                 if response.status_code == 401:
                     raise UserError(_('Authentication failed: %s') % response.text)
-                elif response.status_code in (200, 202):
+                elif response.status_code == 200:
+                    data = response.json()
+                    credit = data.get('credit')
+                    currency = data.get('currency')
+                    rec.balance = f"{credit} {currency}" if credit and currency else ''
                     return {
                         'type': 'ir.actions.client',
                         'tag': 'display_notification',
                         'params': {
                             'title': _('Connection Successful'),
-                            'message': _('Successfully connected to GatewayAPI (message not sent).'),
-                            'type': 'success',
-                            'sticky': False,
-                        }
-                    }
-                elif response.status_code == 422:
-                    # Validation error (e.g., invalid recipient) means connection is OK
-                    return {
-                        'type': 'ir.actions.client',
-                        'tag': 'display_notification',
-                        'params': {
-                            'title': _('Connection Successful'),
-                            'message': _('Successfully connected to GatewayAPI (validation error as expected).'),
+                            'message': _('Successfully connected to GatewayAPI. Balance: %s %s' % (credit, currency)),
                             'type': 'success',
                             'sticky': False,
                         }
