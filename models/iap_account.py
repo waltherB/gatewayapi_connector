@@ -50,7 +50,9 @@ class IapAccount(models.Model):
                 GATEWAYAPI_BASE_URLS[rec.gatewayapi_base_url]
                 + '/rest/me'
             )
-            headers = {'Authorization': f'Token {rec.gatewayapi_token}'}
+            headers = {
+                'Authorization': f'Token {rec.gatewayapi_token}'
+            }
             try:
                 response = requests.get(url, headers=headers, timeout=10)
                 if response.status_code == 401:
