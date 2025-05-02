@@ -1,3 +1,5 @@
+# Does NOT WORK !!!!!
+
 # GatewayAPI Connector for Odoo 17
 
 This module replaces Odoo's SMS IAP with GatewayAPI, using their REST API. It allows you to send SMS messages via GatewayAPI, select the EU or Global platform, configure the sender name, and test connectivity directly from the IAP Account form.
